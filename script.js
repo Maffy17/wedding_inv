@@ -4,6 +4,10 @@
 
 "use strict";
 
+// Prevent the browser from restoring the last scroll position on reload
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+window.scrollTo(0, 0);
+
 /* ── 1 · LOADING SCREEN ────────────────────────────────────── */
 function startLoader() {
   const screen = document.getElementById("loadingScreen");
@@ -11,20 +15,30 @@ function startLoader() {
   if (!screen || !bar) return;
 
   screen.classList.remove("hidden");
+
+  const MIN_DURATION = 2000; // ms — loader visible for at least 2 seconds
+  const startTime = Date.now();
   let progress = 0;
+
   const tick = setInterval(() => {
-    progress += Math.random() * 18 + 4;
+    progress += Math.random() * 6 + 2; // slower, smoother progress
     if (progress >= 100) {
       progress = 100;
       clearInterval(tick);
       bar.style.width = "100%";
+
+      // Wait for the remaining time so the loader is always seen for ≥ 2s
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, MIN_DURATION - elapsed);
+
       setTimeout(() => {
+        window.scrollTo(0, 0);        // guarantee top before revealing hero
         screen.classList.add("hidden");
         document.body.style.overflow = "";
         document
           .querySelectorAll(".reveal-hero")
           .forEach((el) => el.classList.add("visible"));
-      }, 420);
+      }, remaining + 420);
     }
     bar.style.width = Math.min(progress, 100) + "%";
   }, 60);
@@ -494,18 +508,26 @@ document.querySelectorAll(".ornament-divider svg").forEach((svg) => {
     btn.classList.remove("playing");
   }
 
-  // Music starts when the splash "Open Invitation" button is clicked
-  const splashBtn = document.getElementById("splashBtn");
+  // Music starts when the wax seal is clicked
+  const sealBtn = document.getElementById("sealBtn");
   const splashScreen = document.getElementById("splashScreen");
+  const envelope = document.getElementById("envelope");
 
-  splashBtn?.addEventListener("click", () => {
-    splashScreen.classList.add("hidden");
-    startLoader();
-    audio.muted = false;
-    audio
-      .play()
-      .then(setPlaying)
-      .catch(() => setPrompt());
+  sealBtn?.addEventListener("click", () => {
+    sealBtn.classList.add("clicked");
+    // Short pause so the seal glow registers before the flap swings
+    setTimeout(() => envelope?.classList.add("open"), 220);
+    // Card finishes emerging at ~220 + 400(delay) + 1100(transition) = 1720ms
+    setTimeout(() => {
+      window.scrollTo(0, 0);          // reset before splash fades
+      splashScreen.classList.add("hidden");
+      startLoader();
+      audio.muted = false;
+      audio
+        .play()
+        .then(setPlaying)
+        .catch(() => setPrompt());
+    }, 1900);
   });
 
   btn.addEventListener("click", () => {

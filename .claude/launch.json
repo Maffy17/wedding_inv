@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "wedding-inv",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "echo XAMPP static site"],
+      "port": 80,
+      "url": "http://localhost/wedding_inv/"
+    }
+  ]
+}
