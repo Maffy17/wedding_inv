@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "maffy-hurley-rsvp",
+  "compatibility_date": "2026-06-09",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "wedding"
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
