@@ -1,1 +1,1 @@
-wrangler pages deploy . --project-name wedding-inv
+wrangler pages deploy . --project-name hurley-maffy-wedding-inv-rsvp
