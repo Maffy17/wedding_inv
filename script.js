@@ -129,18 +129,18 @@ document
 
 /* ── 5 · COUNTDOWN TIMER ───────────────────────────────────── */
 (function initCountdown() {
-  const WEDDING = new Date("2026-02-14T15:00:00+08:00").getTime();
+  const WEDDING = new Date("2026-12-05T14:00:00+08:00").getTime();
 
-  const elDays = document.getElementById("cdDays");
+  const elDays  = document.getElementById("cdDays");
   const elHours = document.getElementById("cdHours");
-  const elMins = document.getElementById("cdMins");
-  const elSecs = document.getElementById("cdSecs");
+  const elMins  = document.getElementById("cdMins");
+  const elSecs  = document.getElementById("cdSecs");
 
   if (!elDays) return;
 
-  function pad(n, digits = 2) {
-    return String(n).padStart(digits, "0");
-  }
+  let finished = false;
+
+  function pad(n, digits = 2) { return String(n).padStart(digits, "0"); }
 
   function animateFlip(el, newVal) {
     if (el.textContent === newVal) return;
@@ -153,36 +153,127 @@ document
     }, 120);
   }
 
-  // Apply CSS transition to cd-num elements
-  [elDays, elHours, elMins, elSecs].forEach((el) => {
+  [elDays, elHours, elMins, elSecs].forEach(el => {
     el.style.transition = "transform .15s ease, opacity .15s ease";
   });
 
-  function tick() {
-    const now = Date.now();
-    const diff = WEDDING - now;
+  /* ── Confetti ── */
+  function launchConfetti() {
+    const canvas = document.createElement("canvas");
+    canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;";
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    if (diff <= 0) {
-      elDays.textContent = "000";
-      elHours.textContent = "00";
-      elMins.textContent = "00";
-      elSecs.textContent = "00";
-      // Replace timer section text
-      const cdFooter = document.querySelector(".cd-footer");
-      if (cdFooter)
-        cdFooter.textContent = "🎉 The wedding has begun! Congratulations!";
-      return;
+    const COLORS = ["#C9A84C","#D4A5A5","#87A878","#B8860B","#E8D5A3","#9E7B65","#BFA68A","#DAA520","#fff"];
+    const pieces = Array.from({ length: 160 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      w: Math.random() * 10 + 5,
+      h: Math.random() * 6 + 3,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.12,
+      vx: (Math.random() - 0.5) * 2.5,
+      vy: Math.random() * 3 + 2,
+      opacity: 1,
+    }));
+
+    let frame;
+    let start = null;
+    const DURATION = 5000;
+
+    function draw(ts) {
+      if (!start) start = ts;
+      const elapsed = ts - start;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      pieces.forEach(p => {
+        p.x  += p.vx;
+        p.y  += p.vy;
+        p.rot += p.rotSpeed;
+        if (elapsed > DURATION * 0.6) p.opacity = Math.max(0, p.opacity - 0.008);
+
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+
+        if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+      });
+
+      if (elapsed < DURATION) {
+        frame = requestAnimationFrame(draw);
+      } else {
+        canvas.remove();
+      }
     }
+
+    frame = requestAnimationFrame(draw);
+    window.addEventListener("resize", () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+  }
+
+  /* ── Celebration overlay ── */
+  function showCelebration() {
+    const overlay = document.createElement("div");
+    overlay.id = "cd-celebration";
+    overlay.innerHTML = `
+      <div class="cd-cel-card">
+        <div class="cd-cel-flowers">✿ ✦ ✿</div>
+        <p class="cd-cel-pre">Today is the Day</p>
+        <h2 class="cd-cel-title">We Are Married!</h2>
+        <p class="cd-cel-msg">December 05, 2026 · Two hearts, one forever.</p>
+        <div class="cd-cel-flowers">✿ ✦ ✿</div>
+      </div>`;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add("cd-cel-show"));
+  }
+
+  function onFinished() {
+    if (finished) return;
+    finished = true;
+
+    [elDays, elHours, elMins, elSecs].forEach(el => {
+      el.style.transition = "none";
+    });
+    elDays.textContent  = "000";
+    elHours.textContent = "00";
+    elMins.textContent  = "00";
+    elSecs.textContent  = "00";
+
+    const cdWrap = document.getElementById("countdownTimer");
+    if (cdWrap) {
+      cdWrap.style.transition = "opacity .6s";
+      cdWrap.style.opacity = "0";
+      setTimeout(() => { cdWrap.style.display = "none"; }, 650);
+    }
+
+    const cdFooter = document.querySelector(".cd-footer");
+    if (cdFooter) cdFooter.style.display = "none";
+
+    setTimeout(() => {
+      launchConfetti();
+      showCelebration();
+    }, 700);
+  }
+
+  function tick() {
+    const diff = WEDDING - Date.now();
+    if (diff <= 0) { onFinished(); return; }
 
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
 
-    animateFlip(elDays, pad(d, 3));
+    animateFlip(elDays,  pad(d, 3));
     animateFlip(elHours, pad(h));
-    animateFlip(elMins, pad(m));
-    animateFlip(elSecs, pad(s));
+    animateFlip(elMins,  pad(m));
+    animateFlip(elSecs,  pad(s));
   }
 
   tick();
