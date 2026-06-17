@@ -432,7 +432,7 @@ document.querySelectorAll(".ornament-divider svg").forEach((svg) => {
 /* ── 10 · CAPIZ SHIMMER on detail cards ────────────────────── */
 (function shimmerCards() {
   document
-    .querySelectorAll(".detail-card, .tl-card, .dress-card, .gift-card")
+    .querySelectorAll(".detail-card, .tl-card, .dress-card, .dress-unified, .gift-card, .rsvp-card")
     .forEach((card) => {
       card.addEventListener("mousemove", (e) => {
         const r = card.getBoundingClientRect();
@@ -472,93 +472,204 @@ document.querySelectorAll(".ornament-divider svg").forEach((svg) => {
   const SCRIPT_URL =
     "https://script.google.com/macros/s/AKfycbz3kF082iKSP4RcYgWPKtPEzWIH5PL8amk5WdQb2eigNCho94aJtqslOPUr8pSxP65V1w/exec";
 
-  const form = document.getElementById("rsvpForm");
-  const nameInput = document.getElementById("rsvpName");
-  const attendance = document.getElementById("rsvpAttendance");
-  const guestField = document.getElementById("guestField");
-  const guestsInput = document.getElementById("rsvpGuests");
-  const btnAttend = document.getElementById("btnAttend");
-  const btnDecline = document.getElementById("btnDecline");
-  const submitBtn = document.getElementById("rsvpSubmit");
-  const submitLabel = document.getElementById("rsvpSubmitLabel");
-  const errorEl = document.getElementById("rsvpError");
-  const successEl = document.getElementById("rsvpSuccess");
+  const GUEST_GROUPS = [
+    ["Ma", "Tita Sol", "Athan"],
+    ["Ate Grace", "Kuya Mac", "Franzine", "Cheska", "Yuan", "Gab"],
+    ["Ate Joan", "Caelyn", "Caitylyn"],
+    ["Mommy2", "Tonio"],
+    ["Tita Edith", "Shaira", "Ejay"],
+    ["Mama Azon", "Tito Dakne", "Mae", "Zairene", "Maricor"],
+    ["Gogok", "Ate Josie", "Rj", "Misha", "Angelo", "Glen", "Owa", "Quenie"],
+    ["Tita Cathy", "Ninong Ariel", "Ian", "Belle"],
+    ["Tito Zander", "Tita Chix", "Carlos", "Kitkat"],
+    ["Kuya Jei", "Ate Krisha", "KC", "KC 2"],
+    ["Kuya Anoy", "Ate Yhe", "AP"],
+    ["Ate More", "Kuya Fredie", "Ella"],
+    ["Tita Men", "Dapol"],
+    ["Tito Derick", "Tita Ems", "Emman", "Ezech"],
+    ["Hazel"],
+    ["Khamira"],
+    ["Ate Abby"],
+    ["Arcelle"],
+    ["Elaine"],
+    ["Atty. Aladin", "Atty. Aladin wife"],
+    ["Sir Guids", "Sir Guids+1"],
+    ["Tita Karen", "Tita Karen Husband"],
+    ["Tita Ivy", "Tita Carmela", "Tita Nene", "Tita Blessie", "Tita Arlene", "Tita Mars", "Ate Ghie"],
+    ["Vanessa", "Vanessa *plus one"],
+    ["Gab", "Emon"],
+    ["Tita Leony", "Tita Leony husband"],
+    ["Atty. Dennis", "Atty. Dennis Wife"],
+    ["Mam Celia", "Mam Celia Husband"],
+    ["Pauline"],
+    ["Anne"],
+    ["Ella"],
+    ["Sir Alvin"],
+    ["Sir Leo"],
+    ["Sir Lyndon"],
+    ["Sir Edwin"],
+    ["Ate Cindy", "Kuya Rommel"],
+  ];
+
+  const searchInput  = document.getElementById("rsvpSearchInput");
+  const dropdown     = document.getElementById("rsvpDropdown");
+  const searchStep   = document.getElementById("rsvpSearchStep");
+  const groupStep    = document.getElementById("rsvpGroupStep");
+  const memberList   = document.getElementById("rsvpMemberList");
+  const selectedName = document.getElementById("rsvpSelectedName");
+  const submitBtn    = document.getElementById("rsvpSubmit");
+  const submitLabel  = document.getElementById("rsvpSubmitLabel");
+  const errorEl      = document.getElementById("rsvpError");
+  const successEl    = document.getElementById("rsvpSuccess");
   const successTitle = document.getElementById("rsvpSuccessTitle");
-  const successMsg = document.getElementById("rsvpSuccessMsg");
 
-  if (!form) return;
+  const successMsg   = document.getElementById("rsvpSuccessMsg");
+  const backBtn      = document.getElementById("rsvpBack");
 
-  function selectAttendance(value) {
-    attendance.value = value;
-    btnAttend.classList.toggle("selected-attend", value === "Attending");
-    btnDecline.classList.toggle("selected-decline", value === "Not Attending");
-    btnAttend.classList.remove("error-btn");
-    btnDecline.classList.remove("error-btn");
-    guestField.style.display = value === "Attending" ? "flex" : "none";
+  if (!searchInput) return;
+
+  // Fetch already-responded names from Google Sheets on load
+  let responded = new Set();
+  fetch(SCRIPT_URL)
+    .then(r => r.json())
+    .then(names => { responded = new Set(names); })
+    .catch(() => {});
+
+  let currentGroup = [];
+  let chosenName   = "";
+
+  /* Search */
+  searchInput.addEventListener("input", () => {
+    const q = searchInput.value.trim().toLowerCase();
+    if (q.length < 1) { dropdown.hidden = true; return; }
+
+    const matches = [];
+    GUEST_GROUPS.forEach(group => {
+      group.forEach(name => {
+        if (name.toLowerCase().includes(q) && !responded.has(name)) matches.push({ name, group });
+      });
+    });
+
+    if (!matches.length) {
+      dropdown.innerHTML = `<div class="rsvp-dd-empty">No match found</div>`;
+      dropdown.hidden = false;
+      return;
+    }
+
+    dropdown.innerHTML = matches.map(m =>
+      `<div class="rsvp-dd-item" data-name="${m.name}" data-group="${m.group.join("||")}">${m.name}</div>`
+    ).join("");
+    dropdown.hidden = false;
+  });
+
+  dropdown.addEventListener("click", e => {
+    const item = e.target.closest(".rsvp-dd-item");
+    if (!item) return;
+    chosenName   = item.dataset.name;
+    currentGroup = item.dataset.group.split("||");
+    showGroupStep();
+  });
+
+  document.addEventListener("click", e => {
+    if (!e.target.closest("#rsvpSearchStep")) dropdown.hidden = true;
+  });
+
+  function showGroupStep() {
+    searchStep.hidden = true;
+    groupStep.hidden  = false;
+    selectedName.textContent = chosenName;
+
+    const visibleMembers = currentGroup.filter(name => !responded.has(name));
+
+    if (!visibleMembers.length) {
+      memberList.innerHTML = `<p style="text-align:center;color:var(--deep-brown);padding:1rem 0;font-style:italic;">All members of your group have already responded. Thank you!</p>`;
+      submitBtn.style.display = "none";
+      return;
+    }
+    submitBtn.style.display = "";
+
+    memberList.innerHTML = visibleMembers.map(name => `
+      <div class="rsvp-member-row" data-name="${name}">
+        <span class="rsvp-member-name">${name}</span>
+        <div class="rsvp-member-btns">
+          <button type="button" class="rm-btn rm-attend" data-val="Attending">✓ Attending</button>
+          <button type="button" class="rm-btn rm-decline" data-val="Not Attending">✗ Decline</button>
+        </div>
+      </div>`
+    ).join("");
+
+    memberList.querySelectorAll(".rm-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const row = btn.closest(".rsvp-member-row");
+        row.querySelectorAll(".rm-btn").forEach(b => b.classList.remove("rm-active"));
+        btn.classList.add("rm-active");
+      });
+    });
   }
 
-  btnAttend?.addEventListener("click", () => selectAttendance("Attending"));
-  btnDecline?.addEventListener("click", () =>
-    selectAttendance("Not Attending"),
-  );
+  backBtn?.addEventListener("click", () => {
+    groupStep.hidden  = true;
+    searchStep.hidden = false;
+    searchInput.value = "";
+    dropdown.hidden   = true;
+    errorEl.hidden    = true;
+  });
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
+  submitBtn?.addEventListener("click", async () => {
     errorEl.hidden = true;
-    nameInput.classList.remove("error");
-    btnAttend.classList.remove("error-btn");
-    btnDecline.classList.remove("error-btn");
+    const rows = memberList.querySelectorAll(".rsvp-member-row");
+    const results = [];
+    let allAnswered = true;
 
-    let valid = true;
-    if (!nameInput.value.trim()) {
-      nameInput.classList.add("error");
-      valid = false;
-    }
-    if (!attendance.value) {
-      btnAttend.classList.add("error-btn");
-      btnDecline.classList.add("error-btn");
-      valid = false;
-    }
-    if (!valid) {
-      errorEl.textContent =
-        "Please fill in your name and select your attendance.";
+    rows.forEach(row => {
+      const active = row.querySelector(".rm-btn.rm-active");
+      if (!active) { allAnswered = false; return; }
+      results.push({ name: row.dataset.name, status: active.dataset.val });
+    });
+
+    if (!allAnswered) {
+      errorEl.textContent = "Please select Attending or Decline for each person.";
       errorEl.hidden = false;
       return;
     }
 
-    submitBtn.disabled = true;
+    const message = document.getElementById("rsvpMessage").value.trim();
+
+    submitBtn.disabled      = true;
     submitLabel.textContent = "Sending…";
 
     const payload = {
-      name: nameInput.value.trim(),
-      attendance: attendance.value,
-      guests: attendance.value === "Attending" ? guestsInput.value : "0",
-      message: document.getElementById("rsvpMessage").value.trim(),
+      searched_by: chosenName,
+      members:     results.map(r => ({ name: r.name, status: r.status })),
+      message,
     };
 
     try {
       await fetch(SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
+        mode:   "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      form.hidden = true;
-      successEl.hidden = false;
-      if (payload.attendance === "Attending") {
+      // Update local responded set so names hide immediately without reload
+      results.forEach(r => responded.add(r.name));
+
+      groupStep.hidden  = true;
+      successEl.hidden  = false;
+      const count = results.filter(r => r.status === "Attending").length;
+      if (count > 0) {
         successTitle.textContent = "We'll see you there! 🥂";
-        successMsg.textContent = `Thank you, ${payload.name}! We are so excited to celebrate with you on February 14, 2026.`;
+        successMsg.textContent   = `Thank you, ${chosenName}! We're so excited to celebrate with you on December 05, 2026.`;
       } else {
         successTitle.textContent = "We'll miss you 💌";
-        successMsg.textContent = `Thank you for letting us know, ${payload.name}. You will be in our hearts on our special day.`;
+        successMsg.textContent   = `Thank you for letting us know, ${chosenName}. You will be in our hearts on our special day.`;
       }
     } catch {
-      submitBtn.disabled = false;
+      submitBtn.disabled      = false;
       submitLabel.textContent = "Send My RSVP";
-      errorEl.textContent = "Something went wrong. Please try again.";
-      errorEl.hidden = false;
+      errorEl.textContent     = "Something went wrong. Please try again.";
+      errorEl.hidden          = false;
     }
   });
 })();
