@@ -842,6 +842,56 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   line-height: 1;
   animation: loadFade 1.6s ease-in-out infinite alternate;
 }
+.loading-logo {
+  width: 280px;
+  object-fit: contain;
+  animation: loadFade 1.6s ease-in-out infinite alternate;
+  filter: drop-shadow(0 2px 10px rgba(201,168,76,.4));
+}
+/* H & M monogram */
+.hm-monogram {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--champagne, #C9A84C);
+}
+.hm-monogram--lg {
+  animation: loadFade 1.6s ease-in-out infinite alternate;
+}
+.hm-monogram--lg .hm-text {
+  font-family: var(--ff-script, 'Allura', cursive);
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.hm-monogram--lg .hm-text em {
+  font-style: normal;
+  font-size: 2rem;
+  opacity: .75;
+}
+.hm-monogram--lg .hm-rule {
+  display: block;
+  width: 36px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--champagne, #C9A84C));
+  flex-shrink: 0;
+}
+.hm-monogram--lg .hm-rule:last-child {
+  background: linear-gradient(to left, transparent, var(--champagne, #C9A84C));
+}
+.hm-monogram--sm {
+  font-family: var(--ff-script, 'Allura', cursive);
+  font-size: 1.8rem;
+  line-height: 1;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+.hm-monogram--sm em {
+  font-style: normal;
+  font-size: 1.4rem;
+  opacity: .75;
+}
 
 .loading-tagline {
   font-family: var(--ff-elegant);
@@ -892,6 +942,14 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   display: flex; align-items: center; justify-content: space-between;
 }
 
+.nav-logo {
+  height: 120px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  margin-left: 40px;
+  filter: drop-shadow(0 1px 4px rgba(201,168,76,.3));
+}
 .nav-brand {
   font-family: var(--ff-script);
   font-size: 1.8rem;
@@ -2311,6 +2369,12 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   font-size: 3.5rem; color: var(--champagne);
   line-height: 1;
   text-shadow: 0 4px 20px rgba(201,168,76,.25);
+}
+.footer-logo {
+  width: 160px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px rgba(201,168,76,.35));
+  margin-bottom: .5rem;
 }
 
 .footer-names {
