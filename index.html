@@ -41,8 +41,9 @@
       </div>
 
       <div class="env-scene">
-        <!-- Envelope -->
-        <div class="envelope" id="envelope">
+        <!-- Envelope (CSS — hidden, GIF used instead) -->
+        <div class="envelope" id="envelope" style="display:none">
+
           <!-- Flap (folds backward on open) -->
           <div class="env-flap" id="envFlap" aria-hidden="true">
             <div class="env-flap-face"></div>
@@ -1255,11 +1256,17 @@
           </div>
         </div>
 
-        <!-- Names + date below the envelope -->
-        <div class="env-caption">
-          <p class="env-names-text">Hurley <em>&amp;</em> Maffy</p>
-          <p class="env-date-text">December 05, 2026</p>
+        <!-- GIF envelope — visible, hidden button triggers the animation -->
+        <div class="gif-wrap">
+          <!-- Canvas shows first frame (static) until button is clicked -->
+          <canvas id="gifCanvas" class="envelope-gif"></canvas>
+          <!-- Actual GIF — loaded only on click so it starts from frame 1 -->
+          <img id="envelopeGif" class="envelope-gif" src="" alt="Envelope opening" style="display:none" aria-hidden="true" />
+          <!-- Invisible button covering the whole envelope -->
+          <button id="envOpenBtn" class="env-open-btn" aria-label="Open invitation"></button>
         </div>
+
+        <!-- Names + date below the envelope -->
       </div>
 
       <p class="splash-note">🎵 With music</p>
@@ -1335,7 +1342,7 @@
           </g>
           <circle cx="50" cy="50" r="11" />
         </svg>
-        <p class="loading-initials">H &amp; M</p>
+        <img src="logo/logo.png" class="loading-logo" alt="H & M" />
         <p class="loading-tagline">Preparing your invitation…</p>
         <div class="loading-bar-wrap">
           <div class="loading-bar-fill" id="loadingBar"></div>
@@ -1346,7 +1353,9 @@
     <!-- ░░ NAVIGATION ░░ -->
     <nav class="navbar" id="navbar" aria-label="Main navigation">
       <div class="nav-inner">
-        <a href="#hero" class="nav-brand" aria-label="Home">H &amp; M</a>
+        <a href="#hero" class="nav-brand" aria-label="Home">
+          <img src="logo/logo.png" class="nav-logo" alt="H & M" />
+</a>
         <button
           class="hamburger"
           id="hamburger"
@@ -1556,7 +1565,7 @@
         <div class="section-pattern" aria-hidden="true"></div>
         <div class="container">
           <header class="section-header reveal-up">
-            <p class="pre-title">Together With Their Families</p>
+            <!-- <p class="pre-title">Together With Their Families</p> -->
             <h2 class="section-title">Invitation</h2>
             <div class="ornament-divider gold" aria-hidden="true">
               <svg viewBox="0 0 240 28">
@@ -1902,93 +1911,7 @@
         </div>
       </section>
 
-      <!-- ░░ 4 · UNPLUGGED CEREMONY ░░ -->
-      <section class="section unplugged-section" id="unplugged">
-        <div class="container">
-          <div class="unp-card reveal-up">
-            <!-- Camera-free SVG icon -->
-            <div class="unp-icon" aria-hidden="true">
-              <svg
-                viewBox="0 0 96 96"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <!-- Camera body -->
-                <rect
-                  x="10"
-                  y="30"
-                  width="76"
-                  height="52"
-                  rx="7"
-                  stroke="currentColor"
-                  stroke-width="2.8"
-                  stroke-linejoin="round"
-                />
-                <!-- Viewfinder notch -->
-                <path
-                  d="M34 30 L38 20 H58 L62 30"
-                  stroke="currentColor"
-                  stroke-width="2.8"
-                  stroke-linejoin="round"
-                />
-                <!-- Lens ring outer -->
-                <circle
-                  cx="48"
-                  cy="56"
-                  r="17"
-                  stroke="currentColor"
-                  stroke-width="2.8"
-                />
-                <!-- Lens ring inner -->
-                <circle
-                  cx="48"
-                  cy="56"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="2"
-                />
-                <!-- Flash circle -->
-                <circle
-                  cx="24"
-                  cy="40"
-                  r="4"
-                  stroke="currentColor"
-                  stroke-width="2"
-                />
-                <!-- Diagonal no-symbol slash -->
-                <line
-                  x1="16"
-                  y1="16"
-                  x2="80"
-                  y2="80"
-                  stroke="currentColor"
-                  stroke-width="3.2"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </div>
-
-            <h2 class="unp-title">Unplugged Ceremony</h2>
-
-            <div class="unp-rule" aria-hidden="true"></div>
-
-            <p class="unp-message">
-              Thank you for coming!<br />
-              We have but one plea — please keep our ceremony
-              <em>camera-free.</em><br />
-              Though our <em>I do's</em> are unplugged, our reception is not.<br />
-              Once the ceremony is over, you may start snapping shots!
-            </p>
-
-            <div class="unp-rule unp-rule--short" aria-hidden="true"></div>
-
-            <!-- ornament dots -->
-            <p class="unp-dots" aria-hidden="true">✦ &nbsp; ✦ &nbsp; ✦</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ░░ 5 · COUNTDOWN ░░ -->
+      <!-- ░░ 4 · COUNTDOWN ░░ -->
       <section class="section countdown-section" id="countdown">
         <div class="cd-bg" aria-hidden="true"></div>
         <div class="container">
@@ -2082,6 +2005,92 @@
           <p class="cd-footer reveal-fade">
             December 05, 2026 · 2:00 PM · Manila, Philippines
           </p>
+        </div>
+      </section>
+
+      <!-- ░░ 5 · UNPLUGGED CEREMONY ░░ -->
+      <section class="section unplugged-section" id="unplugged">
+        <div class="container">
+          <div class="unp-card reveal-up">
+            <!-- Camera-free SVG icon -->
+            <div class="unp-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 96 96"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <!-- Camera body -->
+                <rect
+                  x="10"
+                  y="30"
+                  width="76"
+                  height="52"
+                  rx="7"
+                  stroke="currentColor"
+                  stroke-width="2.8"
+                  stroke-linejoin="round"
+                />
+                <!-- Viewfinder notch -->
+                <path
+                  d="M34 30 L38 20 H58 L62 30"
+                  stroke="currentColor"
+                  stroke-width="2.8"
+                  stroke-linejoin="round"
+                />
+                <!-- Lens ring outer -->
+                <circle
+                  cx="48"
+                  cy="56"
+                  r="17"
+                  stroke="currentColor"
+                  stroke-width="2.8"
+                />
+                <!-- Lens ring inner -->
+                <circle
+                  cx="48"
+                  cy="56"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <!-- Flash circle -->
+                <circle
+                  cx="24"
+                  cy="40"
+                  r="4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <!-- Diagonal no-symbol slash -->
+                <line
+                  x1="16"
+                  y1="16"
+                  x2="80"
+                  y2="80"
+                  stroke="currentColor"
+                  stroke-width="3.2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+
+            <h2 class="unp-title">Unplugged Ceremony</h2>
+
+            <div class="unp-rule" aria-hidden="true"></div>
+
+            <p class="unp-message">
+              Thank you for coming!<br />
+              We have but one plea — please keep our ceremony
+              <em>camera-free.</em><br />
+              Though our <em>I do's</em> are unplugged, our reception is not.<br />
+              Once the ceremony is over, you may start snapping shots!
+            </p>
+
+            <div class="unp-rule unp-rule--short" aria-hidden="true"></div>
+
+            <!-- ornament dots -->
+            <p class="unp-dots" aria-hidden="true">✦ &nbsp; ✦ &nbsp; ✦</p>
+          </div>
         </div>
       </section>
 
@@ -2991,7 +3000,7 @@
           </svg>
         </div>
 
-        <p class="footer-monogram">H &amp; M</p>
+        <img src="logo/logo.png" class="footer-logo" alt="H & M" />
         <h2 class="footer-names">Hurley<br />&amp; Maffy</h2>
 
         <div class="footer-date-wrap">
