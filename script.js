@@ -715,21 +715,35 @@ document.querySelectorAll(".ornament-divider svg").forEach((svg) => {
   const splashScreen = document.getElementById("splashScreen");
   const envelope = document.getElementById("envelope");
 
-  sealBtn?.addEventListener("click", () => {
-    sealBtn.classList.add("clicked");
-    // Short pause so the seal glow registers before the flap swings
-    setTimeout(() => envelope?.classList.add("open"), 220);
-    // Card finishes emerging at ~220 + 400(delay) + 1100(transition) = 1720ms
+  const envOpenBtn = document.getElementById("envOpenBtn");
+  const gif        = document.getElementById("envelopeGif");
+  const canvas     = document.getElementById("gifCanvas");
+
+  // Draw first frame of GIF to canvas so it looks static (not autoplaying)
+  const preload = new Image();
+  preload.onload = () => {
+    if (!canvas) return;
+    canvas.width  = preload.naturalWidth;
+    canvas.height = preload.naturalHeight;
+    canvas.getContext("2d").drawImage(preload, 0, 0);
+  };
+  preload.src = "envelope/enveloope.gif";
+
+  envOpenBtn?.addEventListener("click", () => {
+    envOpenBtn.style.pointerEvents = "none";
+
+    // Swap canvas for the real GIF (starts from frame 1)
+    if (canvas) canvas.style.display = "none";
+    if (gif)    { gif.src = "envelope/enveloope.gif"; gif.style.display = "block"; }
+
+    // After GIF plays its 4 seconds, go to loader
     setTimeout(() => {
-      window.scrollTo(0, 0);          // reset before splash fades
+      window.scrollTo(0, 0);
       splashScreen.classList.add("hidden");
       startLoader();
       audio.muted = false;
-      audio
-        .play()
-        .then(setPlaying)
-        .catch(() => setPrompt());
-    }, 1900);
+      audio.play().then(setPlaying).catch(() => setPrompt());
+    }, 4000);
   });
 
   btn.addEventListener("click", () => {

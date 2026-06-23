@@ -41,8 +41,9 @@
       </div>
 
       <div class="env-scene">
-        <!-- Envelope -->
-        <div class="envelope" id="envelope">
+        <!-- Envelope (CSS — hidden, GIF used instead) -->
+        <div class="envelope" id="envelope" style="display:none">
+
           <!-- Flap (folds backward on open) -->
           <div class="env-flap" id="envFlap" aria-hidden="true">
             <div class="env-flap-face"></div>
@@ -1255,11 +1256,17 @@
           </div>
         </div>
 
-        <!-- Names + date below the envelope -->
-        <div class="env-caption">
-          <p class="env-names-text">Hurley <em>&amp;</em> Maffy</p>
-          <p class="env-date-text">December 05, 2026</p>
+        <!-- GIF envelope — visible, hidden button triggers the animation -->
+        <div class="gif-wrap">
+          <!-- Canvas shows first frame (static) until button is clicked -->
+          <canvas id="gifCanvas" class="envelope-gif"></canvas>
+          <!-- Actual GIF — loaded only on click so it starts from frame 1 -->
+          <img id="envelopeGif" class="envelope-gif" src="" alt="Envelope opening" style="display:none" aria-hidden="true" />
+          <!-- Invisible button covering the whole envelope -->
+          <button id="envOpenBtn" class="env-open-btn" aria-label="Open invitation"></button>
         </div>
+
+        <!-- Names + date below the envelope -->
       </div>
 
       <p class="splash-note">🎵 With music</p>
