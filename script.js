@@ -738,6 +738,9 @@ document.querySelectorAll(".ornament-divider svg").forEach((svg) => {
 
     // After GIF plays its 4 seconds, go to loader
     setTimeout(() => {
+      // Hide GIF first so it doesn't show through during the splash fade
+      if (gif) gif.style.display = "none";
+
       window.scrollTo(0, 0);
       splashScreen.classList.add("hidden");
       startLoader();
